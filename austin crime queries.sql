@@ -68,56 +68,59 @@ from portfolioproject.austin_crime;
 # What are the distinct Districts in Austin
 select distinct(APDDistrict)
 from portfolioproject.austin_crime;
-
-# What District has the most crimes?
+############################################################################
+# What District has the most crimes? (6th query District with most crimes.csv)
 SELECT 
-	CouncilDistrict, 
+	case
+		when CouncilDistrict is null or TRIM(CouncilDistrict) = '' then 'Unknown'
+        else CouncilDistrict
+        end as CouncilDistrict_, 
     count(CouncilDistrict) as districtCrime
 FROM portfolioproject.austin_crime
-group by CouncilDistrict
+group by CouncilDistrict_
 order by districtCrime desc;
-
-# There is a blank row for the CouncilDistrict that needs to be corrected, lets find all of them
-SELECT CouncilDistrict, APDSector, APDDistrict
-FROM portfolioproject.austin_crime
-#WHERE APDSector = "GE"
-WHERE (trim(CouncilDistrict) = "" or CouncilDistrict != "") and APDSector = "DA";
-
-
-
-# 1 Total Crimes
+############################################################################
+# Total Crimes (1st query Total Crimes.csv)
 # sum of all the reported crimes in the dataset
-SELECT COUNT(IncidentNumber)
-FROM portfolioproject.austin_crime;
+SELECT 
+    `year`,
+    `Month`,
+    case
+		when CouncilDistrict is null or TRIM(CouncilDistrict) = '' then 'Unknown'
+        else CouncilDistrict
+        end as CouncilDistrict_,
+    COUNT(IncidentNumber) as Crimes
+INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/1st query Total crimes.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+FROM portfolioproject.austin_crime
+Group by `year`,`Month`, CouncilDistrict_
+order by `year`, CouncilDistrict_ desc;
 
+SHOW VARIABLES LIKE 'secure_file_priv';
 
-# 2 Crime Distributin by Year and Yearly Changes
+########################################################
+# 2 Crime Distribution by Year and Yearly Changes (2nd query.csv)
 # Analysis of crimes categorized by year, including insights into the year-over-year changes
-SELECT right(OccurredDate,4) as extracted_year, count(OccurredDate)
+SELECT right(OccurredDate,4) as extracted_year, count(OccurredDate) as crimes_committed
 FROM portfolioproject.austin_crime
-WHERE RIGHT(OccurredDate, 4) IN (
-  '2003','2004','2005','2006','2007','2008','2009',
-  '2010','2011','2012','2013','2014','2015','2016',
-  '2017','2018', '2019', '2020', '2021', '2022', 
-  '2023', '2024', '2025'
-)
-group by extracted_year;
+WHERE RIGHT(OccurredDate, 4) != '2025'
+group by extracted_year
+order by crimes_committed desc;
 
-# 3 Crimes by Time Range 
+########################################################
+# Crimes by Time Range 
 # Exploration of crime occurrences within specific time intervals, providing a detailed breakdown
-SELECT 
-	#right(OccurredDateTime, 4) as occurred_time, 
-    str_to_date(OccurredTime, '%H:%i') as occurred_time,
-    count(*)
-FROM portfolioproject.austin_crime
-GROUP BY occurred_time;
 
-# Most popular days crimes were committed # OccurredDate has no missing values so we're using it instead of DateTime which includes the date and the time
+# Most popular days crimes were committed by year# OccurredDate has no missing values so we're using it instead of DateTime which includes the date and the time
 WITH week_crimes as (SELECT 
-	dayofweek(str_to_date(OccurredDate,'%m/%d/%Y')) as num_of_day
+	dayofweek(str_to_date(OccurredDate,'%m/%d/%Y')) as num_of_day,
+    OccurredDate
 FROM portfolioproject.austin_crime
 )
 SELECT 
+	right(OccurredDate,4) as years,
 	case 
 		when num_of_day = 1 then 'Monday'
         when num_of_day = 2 then 'Tuesday'
@@ -127,15 +130,53 @@ SELECT
         when num_of_day = 6 then 'Saturday'
         when num_of_day = 7 then 'Sunday'
         else 'Unknown' end as day_of_week,
-    count(*)
+    count(*) as crimes
 FROM week_crimes
-GROUP BY day_of_week
-;
+WHERE RIGHT(OccurredDate, 4) != '2025'
+GROUP BY years, day_of_week
+order by years desc;
 
-SELECT 
-    *
-FROM portfolioproject.austin_crime
-WHERE IncidentNumber = 20031901191;
+########################################################
+# Changing the table to now have a column for the year
+ALTER TABLE austin_crime
+ADD `year` TEXT;
+# Populate the newly added column
+SET SQL_SAFE_UPDATES = 0;
+UPDATE austin_crime
+SET `year` = RIGHT(OccurredDate,4);
+SET SQL_SAFE_UPDATES = 1;
+########################################################
+
+# Changing the table to now have a column for the Month
+ALTER TABLE austin_crime
+ADD `Month` TEXT;
+# Populate the newly added column
+SET SQL_SAFE_UPDATES = 0;
+UPDATE austin_crime
+SET `Month` = CASE 
+    WHEN `Month` = '01' THEN 'January'
+    WHEN `Month` = '02' THEN 'February'
+    WHEN `Month` = '03' THEN 'March'
+    WHEN `Month` = '04' THEN 'April'
+    WHEN `Month` = '05' THEN 'May'
+    WHEN `Month` = '06' THEN 'June'
+    WHEN `Month` = '07' THEN 'July'
+    WHEN `Month` = '08' THEN 'August'
+    WHEN `Month` = '09' THEN 'September'
+    WHEN `Month` = '10' THEN 'October'
+    WHEN `Month` = '11' THEN 'November'
+    WHEN `Month` = '12' THEN 'December'
+    ELSE `Month` -- fallback if it doesn't match any known value
+END;
+SET SQL_SAFE_UPDATES = 1;
+
+# 3 Crimes by month for each year
+select `year`, `Month`, count(`year`) as crimes
+from austin_crime
+group by `year`, `Month`;
+
+########################################################
+
 
 
 # 4 Heatmap showing Crime Distribution by Weekdays and Months
@@ -144,8 +185,21 @@ WHERE IncidentNumber = 20031901191;
 # 5 Crimes by Country: ((((((Instead do apd sector???
 # Examination of crimes categorized by the country where they occurred
 
-# Total resolved and unresolved crimes
+##########################################################################
+# Total resolved and unresolved crimes (Clearance Status.csv)
 # getting an overview of the overall resolution rate
+SELECT 
+	CouncilDistrict,
+    `year`,
+    `Month`,
+	format((sum(case when ClearanceStatus = 'N' then 1 end)/ count(*) * 100), 2) as not_cleared,
+     format((sum(case when ClearanceStatus = 'C' then 1 end)/ count(*) * 100), 2) as cleared,
+     format((sum(case when trim(ClearanceStatus) = 'O' then 1 end)/ count(*) * 100), 2) as other,
+    format((sum(case when trim(ClearanceStatus) = '' then 1 end)/ count(*) * 100), 2) as tba
+from portfolioproject.austin_crime
+group by CouncilDistrict, `year`, `Month`
+;
+############################################################################
 
 # Monthly crime trend with percentage Variance
 # analysis of the montly crime trend, accompanied by the percentage variance to highlight fluctuations
@@ -153,9 +207,30 @@ WHERE IncidentNumber = 20031901191;
 # Identification of the most dangerous time of the day
 # exploration to pinpoint the specific time periods during the day associated with a higher frequency of crimes
 
-
-
-# What are the top 10 most common crimes committed?
+#####################################################
+# this query is to see the popular times to commit a crime across all years for the given weekday (Crime heatmap.csv)
+WITH day_of_week_cte as (SELECT 
+	dayofweek(str_to_date(OccurredDateTime,'%m/%d/%Y')) as num_of_day,
+    OccurredDateTime
+FROM portfolioproject.austin_crime
+)
+SELECT 
+    hour(right(OccurredDateTime,5)) as hour_of_day, # we want to group by hour
+	case 
+		when num_of_day = 1 then 'Monday'
+        when num_of_day = 2 then 'Tuesday'
+        when num_of_day = 3 then 'Wednesday'
+        when num_of_day = 4 then 'Thursday'
+        when num_of_day = 5 then 'Friday'
+        when num_of_day = 6 then 'Saturday'
+        when num_of_day = 7 then 'Sunday'
+        else 'Unknown' end as day_of_week,
+    count(*) as crimes
+FROM day_of_week_cte
+group by day_of_week, hour_of_day
+order by crimes desc;
+#####################################################
+# What are the top 10 most common crimes committed? (Most Common Crimes.csv)
 SELECT 
 	HighestOffenseDescription, 
 	count(HighestOffenseDescription) as `Number of Crimes`
@@ -164,14 +239,35 @@ GROUP BY HighestOffenseDescription
 ORDER BY `Number of Crimes` desc
 LIMIT 10;
 
-# Lets take a closer look at Burglary of Vehicle
-with vehicle_cte as (
-select *
-from portfolioproject.austin_crime
-where HighestOffenseDescription LIKE '%BURGLARY OF VEHICLE%'
-)
-select * 
-from vehicle_cte;
+#######################################################
+
+SELECT 
+    year,
+    month,
+    CouncilDistrict,
+    HighestOffenseDescription,
+    Crimes
+INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/top 10 crimes.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+FROM (
+    SELECT 
+        `year`,
+        `month`,
+        CouncilDistrict,
+         HighestOffenseDescription,
+        COUNT(*) AS Crimes,
+        ROW_NUMBER() OVER (
+            PARTITION BY `year`, `month`, CouncilDistrict
+            ORDER BY COUNT(*) DESC
+        ) AS rn
+    FROM portfolioproject.austin_crime
+    GROUP BY `year`, `month`, CouncilDistrict,  HighestOffenseDescription
+) ranked
+WHERE rn <= 10
+ORDER BY `year`, `month`, CouncilDistrict, rn;
+
 
 
 
