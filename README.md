@@ -10,7 +10,7 @@ The SQL queries utilized to prepare the data for the dashboard can be found [her
 
 ## Project Overview
 
--  Source: [Austin Crime Reports](https://data.austintexas.gov/Public-Safety/Crime-Reports/fdj4-gpfu)
+-  Source: [Austin Crime Reports data](https://data.austintexas.gov/Public-Safety/Crime-Reports/fdj4-gpfu)
 -  Querying crime data using **MySQL**
 -  Export results to **CSV**
 -  Built an interactive dashboard in **Power BI**
