@@ -5,6 +5,7 @@ This project analyzes and synthesizes Austin’s Crime data in order to uncover 
 
 Dashboard is available to download [here](https://raw.githubusercontent.com/alejandroespinosa99ae/Austin-Crime-Analysis/main/Austin%20Crime%20Dashboard.pbix)
 The SQL queries utilized to prepare the data for the dashboard can be found [here](https://raw.githubusercontent.com/alejandroespinosa99ae/Austin-Crime-Analysis/main/austin%20crime%20queries.sql)
+
 ---
 
 ## Project Overview
@@ -43,7 +44,8 @@ Since 2009, total crime has decreased by 41%, this trend may reflect a combinati
 
 Below is an overview page for the interactive PowerBi dashboard. The entire interactive dashboard be be downloaded [here](https://raw.githubusercontent.com/alejandroespinosa99ae/Austin-Crime-Analysis/main/Austin%20Crime%20Dashboard.pbix)
 
-![Alt text](https://imgur.com/a/Uok2H0O)
+![Alt text](https://i.imgur.com/fjO2KnS.png)
+
 ---
 
 ## License
