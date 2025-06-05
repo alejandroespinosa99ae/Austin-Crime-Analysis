@@ -3,7 +3,7 @@
 The [Austin Open Data Portal](https://data.austintexas.gov/Public-Safety/Crime-Reports/fdj4-gpfu/about_data) is designed to provide high value city data to users interested in finding out more about their city, researching specific topics or using data to develop software applications. 
 This project analyzes and synthesizes Austin’s Crime data in order to uncover critical insights to improve public safety 
 
-Dashboard is available to download [here](https://raw.githubusercontent.com/alejandroespinosa99ae/SQL-Projects/main/Austin Crime Dashboard.pibx)
+Dashboard is available to download [here](https://raw.githubusercontent.com/alejandroespinosa99ae/Austin-Crime-Analysis/main/Austin Crime Dashboard.pibx)
 ---
 
 ## Project Overview
