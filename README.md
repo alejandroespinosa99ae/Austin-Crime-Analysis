@@ -1,19 +1,21 @@
-# 🚔 Austin Crime Data Dashboard
+# Project Background
 
-This project uses public crime data from the [City of Austin Open Data Portal](https://data.austintexas.gov/Public-Safety/Crime-Reports/fdj4-gpfu/about_data) to uncover insights and trends. The data is queried using **MySQL**, saved as a **CSV**, and imported into **Power BI** to create an interactive dashboard.
+The [Austin Open Data Portal](https://data.austintexas.gov/Public-Safety/Crime-Reports/fdj4-gpfu/about_data) is designed to provide high value city data to users interested in finding out more about their city, researching specific topics or using data to develop software applications. 
+This project analyzes and synthesizes Austin’s Crime data in order to uncover critical insights to improve public safety 
+
+Dashboard is available to download here
+---
+
+## Project Overview
+
+-  Source: [Austin Crime Reports](https://data.austintexas.gov/Public-Safety/Crime-Reports/fdj4-gpfu)
+-  Querying crime data using **MySQL**
+-  Exporting results to **CSV**
+-  Building an interactive dashboard in **Power BI**
 
 ---
 
-## 🔍 Project Overview
-
-- 📥 Source: [Austin Crime Reports](https://data.austintexas.gov/Public-Safety/Crime-Reports/fdj4-gpfu)
-- 🧮 Querying crime data using **MySQL**
-- 📄 Exporting results to **CSV**
-- 📊 Building an interactive dashboard in **Power BI**
-
----
-
-## 🧰 Tech Stack
+##Tech Stack
 
 - **MySQL** – for data querying and analysis
 - **CSV** – for intermediate data storage and portability
@@ -21,7 +23,7 @@ This project uses public crime data from the [City of Austin Open Data Portal](h
 
 ---
 
-## 📈 Dashboard Features
+## Dashboard Features
 
 - Filter crime data by:
   - **Year**
@@ -35,20 +37,20 @@ This project uses public crime data from the [City of Austin Open Data Portal](h
 
 ---
 
-## 📌 Notes
+## Notes
 
 - The dataset is updated regularly by the City of Austin.
 - Dashboard is available to download
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
 
 ---
 
-## 📬 Source
+## Source
 
 Austin Open Data Portal:  
 [https://data.austintexas.gov/Public-Safety/Crime-Reports/fdj4-gpfu](https://data.austintexas.gov/Public-Safety/Crime-Reports/fdj4-gpfu)
