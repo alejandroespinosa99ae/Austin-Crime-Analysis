@@ -38,6 +38,7 @@ This project uses public crime data from the [City of Austin Open Data Portal](h
 ## 📌 Notes
 
 - The dataset is updated regularly by the City of Austin.
+- Dashboard is available to download
 
 ---
 
